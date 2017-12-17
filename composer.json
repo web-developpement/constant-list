@@ -1,0 +1,26 @@
+{
+    "name": "web-developpement/constant-list",
+    "description": "A manager to easily manage class constant's lists and labels",
+    "authors": [
+        {
+            "name": "Vincent Vaur",
+            "email": "contact@web-developpement.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "WebDeveloppement\\ConstantList\\": "lib"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { "WebDeveloppement\\ConstantList\\Tests\\": "tests" }
+    },
+    "require": {
+        "php": "^7.1",
+        "psr/cache": "^1.0",
+        "phpfastcache/phpfastcache": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    }
+}
