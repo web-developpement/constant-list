@@ -1,4 +1,4 @@
-<phpunit  bootstrap="vendor/autoload.php" colors="true">
+<phpunit bootstrap="vendor/autoload.php" colors="true">
     <testsuites>
         <testsuite name="ConstantList">
             <directory>./tests</directory>
@@ -10,9 +10,4 @@
             <directory suffix=".php">./lib</directory>
         </whitelist>
     </filter>
-
-    <logging>
-        <log type="testdox-text" target="php://stdout" />
-        <log type="coverage-text" target="php://stdout" />
-    </logging>
 </phpunit >
