@@ -22,6 +22,13 @@ use PHPUnit\Framework\TestCase;
 use WebDeveloppement\ConstantList\ConstantList;
 use WebDeveloppement\ConstantList\ConstantListException;
 
+/**
+ * Class ConstantListTest.
+ *
+ * Test class for ConstantList class
+ *
+ * @author Vincent Vaur <contact@web-developpement.com>
+ */
 final class ConstantListTest extends TestCase
 {
     /**

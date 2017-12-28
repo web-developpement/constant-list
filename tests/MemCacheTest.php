@@ -19,10 +19,16 @@
 namespace WebDeveloppement\ConstantList\Tests;
 
 use PHPUnit\Framework\TestCase;
-use WebDeveloppement\ConstantList\Cache\CacheItem;
 use WebDeveloppement\ConstantList\Cache\InvalidArgumentException;
 use WebDeveloppement\ConstantList\Cache\MemCache;
 
+/**
+ * Class MemCacheTest.
+ *
+ * Test class for MemCache class
+ *
+ * @author Vincent Vaur <contact@web-developpement.com>
+ */
 final class MemCacheTest extends TestCase
 {
     /**

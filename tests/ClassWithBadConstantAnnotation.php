@@ -18,7 +18,13 @@
 
 namespace WebDeveloppement\ConstantList\Tests;
 
-
+/**
+ * Class ClassWithBadConstantAnnotation.
+ *
+ * Test class with bad ConstantList annotations
+ *
+ * @author Vincent Vaur <contact@web-developpement.com>
+ */
 class ClassWithBadConstantAnnotation
 {
     /**

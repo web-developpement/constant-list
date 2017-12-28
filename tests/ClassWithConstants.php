@@ -18,7 +18,13 @@
 
 namespace WebDeveloppement\ConstantList\Tests;
 
-
+/**
+ * Class ClassWithConstants.
+ *
+ * Test class with ConstantList annotations
+ *
+ * @author Vincent Vaur <contact@web-developpement.com>
+ */
 class ClassWithConstants
 {
     /**
