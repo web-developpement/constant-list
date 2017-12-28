@@ -20,8 +20,10 @@ declare(strict_types=1);
 
 namespace WebDeveloppement\ConstantList\Tests;
 
+use phpFastCache\CacheManager;
 use PHPUnit\Framework\TestCase;
 use WebDeveloppement\ConstantList\ConstantList;
+use WebDeveloppement\ConstantList\ConstantListException;
 
 /**
  * @covers \WebDeveloppement\ConstantList\ConstantList
@@ -44,6 +46,7 @@ final class ConstantListTest extends TestCase
             count($constants) == 2
         );
     }
+
 
     /**
      * @test
@@ -70,6 +73,12 @@ final class ConstantListTest extends TestCase
         $this->assertTrue(
             count($constants) == 0
         );
+
+        $this->expectException(ConstantListException::class);
+        ConstantList::get(ClassWithBadConstantAnnotation::class);
+
+        $this->expectException(ConstantListException::class);
+        ConstantList::getList(ClassWithBadConstantAnnotation::class, "without-label");
     }
 
 
@@ -81,11 +90,11 @@ final class ConstantListTest extends TestCase
     {
         $this->assertEquals(
             'Format PDF in multi line format',
-            ConstantList::getLabel(ClassWithConstants::class, 'format',ClassWithConstants::FORMAT_PDF)
+            ConstantList::getLabel(ClassWithConstants::class, 'format', ClassWithConstants::FORMAT_PDF)
         );
 
         $this->assertNull(
-            ConstantList::getLabel(ClassWithConstants::class, 'format','unknow')
+            ConstantList::getLabel(ClassWithConstants::class, 'format', 'unknow')
         );
     }
 
@@ -97,11 +106,11 @@ final class ConstantListTest extends TestCase
     public function exists(): void
     {
         $this->assertTrue(
-            ConstantList::exists(ClassWithConstants::class, 'format',ClassWithConstants::FORMAT_PDF)
+            ConstantList::exists(ClassWithConstants::class, 'format', ClassWithConstants::FORMAT_PDF)
         );
 
         $this->assertTrue(
-            !ConstantList::exists(ClassWithConstants::class, 'format','unknown-constant')
+            !ConstantList::exists(ClassWithConstants::class, 'format', 'unknown-constant')
         );
     }
 
@@ -112,6 +121,14 @@ final class ConstantListTest extends TestCase
      */
     public function cache(): void
     {
+        CacheManager::setDefaultConfig([
+            "securityKey"      => 'constant-list',
+            "path"             => sys_get_temp_dir(),
+            "itemDetailedDate" => false
+        ]);
+
+        ConstantList::setCache(CacheManager::getInstance('files'));
+
         $defaultCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'constant-list' . DIRECTORY_SEPARATOR . "Files";
         ConstantList::get(ClassWithConstants::class);
 

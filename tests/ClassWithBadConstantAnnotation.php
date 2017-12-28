@@ -16,16 +16,20 @@
  * and is licensed under the MIT license.
  */
 
-namespace WebDeveloppement\ConstantList;
+namespace WebDeveloppement\ConstantList\Tests;
 
-/**
- * Class ConstantException
- *
- * Exception thrown by the constant manager
- *
- * @author Vincent Vaur <contact@web-developpement.com>
- */
-class ConstantException extends \Exception
+
+class ClassWithBadConstantAnnotation
 {
+    /**
+     * Type 1
+     *
+     * @ConstantList
+     */
+    const WITHOUT_LIST_LABEL = "WITHOUT_LIST_LABEL";
 
+    /**
+     * @ConstantList without-label
+     */
+    const WITHOUT_LABEL = "WITHOUT_LABEL";
 }

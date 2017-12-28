@@ -18,7 +18,6 @@
 
 namespace WebDeveloppement\ConstantList;
 
-use phpFastCache\CacheManager;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -32,9 +31,13 @@ class ConstantList
 {
     /**
      * @var CacheItemPoolInterface The cache manager. Must implements PSR-6 cache interfaces.
-     *                             Use phpfastcache file cache by default.
      */
     private static $cache;
+
+    /**
+     * @var array Cache used if no cache interface has been provided
+     */
+    private static $memCache = array();
 
     /**
      * @var bool Debug mode. If true, disabling the cache manager.
@@ -51,7 +54,7 @@ class ConstantList
      *
      * @param CacheItemPoolInterface $cache
      */
-    public static function setCache(CacheItemPoolInterface $cache): void
+    public static function setCache(CacheItemPoolInterface $cache)
     {
         self::$cache = $cache;
     }
@@ -62,7 +65,11 @@ class ConstantList
      */
     public static function clearCache()
     {
-        self::getCache()->clear();
+        self::$memCache = array();
+
+        if (!empty(self::$cache)) {
+            self::getCache()->clear();
+        }
     }
 
 
@@ -71,7 +78,7 @@ class ConstantList
      *
      * @param bool $debug
      */
-    public static function setDebug(bool $debug): void
+    public static function setDebug($debug)
     {
         self::$debug = $debug;
     }
@@ -84,18 +91,8 @@ class ConstantList
      *
      * @return CacheItemPoolInterface
      */
-    private static function getCache(): CacheItemPoolInterface
+    private static function getCache()
     {
-        if (empty(self::$cache)) {
-            CacheManager::setDefaultConfig([
-                "securityKey"      => 'constant-list',
-                "path"             => sys_get_temp_dir(),
-                "itemDetailedDate" => false
-            ]);
-
-            self::setCache(CacheManager::getInstance('files'));
-        }
-
         return self::$cache;
     }
 
@@ -107,7 +104,7 @@ class ConstantList
      *
      * @return array
      */
-    public static function get(string $className): array
+    public static function get($className)
     {
         // Deactivate the cache in debug mode
         if (self::$debug) {
@@ -117,15 +114,25 @@ class ConstantList
         // Normalize class name to use it as cache item key
         $normalizedClassName = mb_strtolower(preg_replace('/\\\/', '-', $className));
 
-        $cacheItem = self::getCache()->getItem($normalizedClassName);
+        // Cache provided, get item from it
+        if(!empty(self::$cache)) {
+            $cacheItem = self::getCache()->getItem($normalizedClassName);
 
-        // Cache item if necessary
-        if (!$cacheItem->isHit()) {
-            $cacheItem->set(self::parse($className));
-            self::getCache()->save($cacheItem);
+            // Cache the item if necessary
+            if (!$cacheItem->isHit()) {
+                $cacheItem->set(self::parse($className));
+                self::getCache()->save($cacheItem);
+            }
+
+            return $cacheItem->get();
         }
 
-        return $cacheItem->get();
+        // Get item from default memcache
+        if (!array_key_exists($normalizedClassName, self::$memCache)) {
+            self::$memCache[$normalizedClassName] = self::parse($className);
+        }
+
+        return self::$memCache[$normalizedClassName];
     }
 
 
@@ -137,11 +144,11 @@ class ConstantList
      *
      * @return array
      */
-    public static function getList(string $className, string $list): array
+    public static function getList($className, $list)
     {
         $constants = self::get($className);
 
-        return array_key_exists($list, $constants) ? $constants[$list] : [];
+        return array_key_exists($list, $constants) ? $constants[$list] : array();
     }
 
 
@@ -154,7 +161,7 @@ class ConstantList
      *
      * @return mixed
      */
-    public static function getLabel(string $className, string $list, string $value)
+    public static function getLabel($className, $list, $value)
     {
         $constantList = self::getList($className, $list);
 
@@ -171,7 +178,7 @@ class ConstantList
      *
      * @return bool
      */
-    public static function exists(string $className, string $list, $value): bool
+    public static function exists($className, $list, $value)
     {
         return !empty(self::getLabel($className, $list, $value));
     }
@@ -186,14 +193,14 @@ class ConstantList
      *
      * @return array
      */
-    private static function parse(string $className): array
+    private static function parse($className): array
     {
         $reflection = new \ReflectionClass($className);
         $content = file_get_contents($reflection->getFileName());
         $tokens = token_get_all($content);
 
         $constantList = [];
-        $comment = null;
+        $docBlock = null;
         $isConst = false;
 
         foreach ($tokens as $token) {
@@ -201,58 +208,94 @@ class ConstantList
                 continue;
             }
 
-            list($tokenType, $tokenValue) = $token;
-
-            switch ($tokenType) {
-                case T_WHITESPACE:
-                case T_COMMENT:
-                    break;
-
-                case T_DOC_COMMENT:
-                    $comment = $tokenValue;
-                    break;
-
-                // We are parsing a constant doc block
-                case T_CONST:
-                    $isConst = true;
-                    break;
-
-                case T_STRING:
-                    // If we are parsing a constant doc block and if we match the @ConstantList annotation in it,
-                    // extract the constant list data.
-                    if ($isConst && !empty($comment) && preg_match('/\@ConstantList ([A-Za-z_0-9-]+)/', $comment, $matches)) {
-                        $constantListName = $matches[1];
-
-                        // Initialize the constant list if necessary
-                        if (!array_key_exists($constantListName, $constantList)) {
-                            $constantList[$constantListName] = [];
-                        }
-
-                        $commentLines = preg_split('/\R/', $comment);
-                        $constantLabels = [];
-
-                        foreach ($commentLines as $line) {
-                            $line = trim($line, "/* \t\x0B\0");
-
-                            if (!empty($line) && !preg_match('/\@ConstantList/', $line)) {
-                                $constantLabels[] = $line;
-                            }
-                        }
-
-                        $constantList[$constantListName][$reflection->getConstant($tokenValue)] = implode(' ', $constantLabels);
-                    }
-
-                    $comment = null;
-                    $isConst = false;
-                    break;
-
-                default:
-                    $comment = null;
-                    $isConst = false;
-                    break;
-            }
+            self::parseToken($token, $constantList, $docBlock, $isConst, $reflection);
         }
 
         return $constantList;
+    }
+
+
+    /**
+     * Parse the token details and updates variables if necessary
+     *
+     * @param array            $token
+     * @param array            $constantList
+     * @param string           $docBlock
+     * @param boolean          $isConst
+     * @param \ReflectionClass $reflection
+     *
+     * @throws ConstantListException
+     */
+    private static function parseToken($token, &$constantList, &$docBlock, &$isConst, \ReflectionClass $reflection)
+    {
+        list($tokenType, $tokenValue) = $token;
+
+        switch ($tokenType) {
+            case T_WHITESPACE:
+            case T_COMMENT:
+                break;
+
+            case T_DOC_COMMENT:
+                $docBlock = $tokenValue;
+                break;
+
+            // We are parsing a constant doc block
+            case T_CONST:
+                $isConst = true;
+                break;
+
+            case T_STRING:
+                // If we are parsing a constant doc block and if we match the @ConstantList annotation in it,
+                // extracts the constants list data.
+                if ($isConst && !empty($docBlock) && preg_match('/\@ConstantList ([A-Za-z_0-9-]+)/', $docBlock, $matches)) {
+                    $constantListName = $matches[1];
+
+                    // Initializes constants list if necessary
+                    if (!array_key_exists($constantListName, $constantList)) {
+                        $constantList[$constantListName] = [];
+                    }
+
+                    $constantList[$constantListName][$reflection->getConstant($tokenValue)] = self::parseConstantComment($docBlock);
+                }
+
+                $docBlock = null;
+                $isConst = false;
+                break;
+
+            default:
+                $docBlock = null;
+                $isConst = false;
+        }
+    }
+
+
+    /**
+     * Extracts the constant label from the given constant doc block
+     *
+     * @param string $docBlock
+     *
+     * @return string
+     *
+     * @throws ConstantListException
+     */
+    private static function parseConstantComment($docBlock)
+    {
+        // Splits comment lines
+        $commentLines = preg_split('/\R/', $docBlock);
+        $constantLabels = [];
+
+        foreach ($commentLines as $line) {
+            $line = trim($line, "/* \t\x0B\0");
+
+            if (!empty($line) && !preg_match('/\@ConstantList/', $line)) {
+                $constantLabels[] = $line;
+            }
+        }
+
+        if (empty($constantLabels)) {
+            throw new ConstantListException();
+        }
+
+        return implode(' ', $constantLabels);
     }
 }
