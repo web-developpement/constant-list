@@ -16,62 +16,16 @@
  * and is licensed under the MIT license.
  */
 
-namespace WebDeveloppement\ConstantList\Tests;
+namespace WebDeveloppement\ConstantList\Cache;
 
-
-class ClassWithConstants
+/**
+ * Class InvalidArgumentException.
+ *
+ * Implements the PSR-16 CacheException
+ *
+ * @author Vincent Vaur <contact@web-developpement.com>
+ */
+class CacheException extends \Exception implements \Psr\SimpleCache\CacheException
 {
-    /**
-     * Type 1
-     *
-     * @ConstantList type
-     */
-    const TYPE_1 = "TYPE_1";
 
-    /**
-     * Type 2
-     *
-     * @ConstantList type
-     */
-    const TYPE_2 = "TYPE_2";
-
-    /**
-     * Type 3
-     *
-     * @ConstantList type
-     */
-    const TYPE_3 = "TYPE_3";
-
-    /**
-     * Format XML
-     *
-     * @ConstantList format
-     */
-    const FORMAT_XML = "XML";
-
-    /**
-     * Format PDF
-     * in multi line format
-     *
-     * @ConstantList format
-     */
-    const FORMAT_PDF = "PDF";
-
-
-    public function __construct()
-    {
-
-    }
-
-
-    /**
-     * Just here to test PHP parser
-     *
-     * @param null $value
-     *
-     * @return null
-     */
-    private function testPrivate($value = null) {
-        return $value;
-    }
 }

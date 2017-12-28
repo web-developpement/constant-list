@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a1afd449d06de74ca7ab030f4594ed1b",
-    "content-hash": "23e9382e97fc23dc8d11f222b9f611be",
+    "hash": "cf3dba1e796c7725c49c7340547174c8",
+    "content-hash": "874d2f89fd6860e17723b95fd458cb1a",
     "packages": [
         {
-            "name": "psr/cache",
-            "version": "1.0.1",
+            "name": "psr/simple-cache",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-fig/cache.git",
-                "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8"
+                "url": "https://github.com/php-fig/simple-cache.git",
+                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/cache/zipball/d11b50ad223250cf17b86e38383413f5a6764bf8",
-                "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/753fa598e8f3b9966c886fe13f370baa45ef0e24",
+                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24",
                 "shasum": ""
             },
             "require": {
@@ -32,7 +32,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Cache\\": "src/"
+                    "Psr\\SimpleCache\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -45,13 +45,15 @@
                     "homepage": "http://www.php-fig.org/"
                 }
             ],
-            "description": "Common interface for caching libraries",
+            "description": "Common interfaces for simple caching",
             "keywords": [
                 "cache",
+                "caching",
                 "psr",
-                "psr-6"
+                "psr-16",
+                "simple-cache"
             ],
-            "time": "2016-08-06 20:24:11"
+            "time": "2017-01-02 13:31:39"
         }
     ],
     "packages-dev": [
@@ -407,102 +409,6 @@
                 }
             ],
             "time": "2017-07-14 14:27:02"
-        },
-        {
-            "name": "phpfastcache/phpfastcache",
-            "version": "6.0.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHPSocialNetwork/phpfastcache.git",
-                "reference": "606c29476bd21d907dcd535716d66b31aa999538"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHPSocialNetwork/phpfastcache/zipball/606c29476bd21d907dcd535716d66b31aa999538",
-                "reference": "606c29476bd21d907dcd535716d66b31aa999538",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "php": "^5.6 || ^7.0 || ^7.1 || ^7.2",
-                "psr/cache": "~1.0.0",
-                "psr/simple-cache": "~1.0.0"
-            },
-            "conflict": {
-                "doctrine/couchdb": "*"
-            },
-            "suggest": {
-                "ext-apc": "*",
-                "ext-intl": "*",
-                "ext-leveldb": "*",
-                "ext-memcache": "*",
-                "ext-memcached": "*",
-                "ext-redis": "*",
-                "ext-sqlite": "*",
-                "ext-wincache": "*",
-                "ext-xcache": "*",
-                "mongodb/mongodb": "^1.1",
-                "phpfastcache/couchdb": "~1.0.0",
-                "phpfastcache/phpssdb": "~1.0.0",
-                "predis/predis": "~1.1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "phpFastCache\\": "src/phpFastCache/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Khoa Bui",
-                    "email": "khoaofgod@gmail.com",
-                    "homepage": "http://www.phpfastcache.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Georges.L",
-                    "email": "contact@geolim4.com",
-                    "homepage": "https://github.com/Geolim4",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP Cache Class - Reduce your database call using cache system. PhpFastCache handles a lot of drivers such as Apc(u), Cassandra, CouchBase, Couchdb, Mongodb, Files, (P)redis, Leveldb, Memcache(d), Ssdb, Sqlite, Wincache, Xcache, Zend Data Cache.",
-            "homepage": "http://www.phpfastcache.com",
-            "keywords": [
-                "LevelDb",
-                "apc",
-                "apcu",
-                "cache",
-                "cache class",
-                "caching",
-                "cassandra",
-                "cookie",
-                "couchbase",
-                "couchdb",
-                "files cache",
-                "memcache",
-                "memcached",
-                "mongodb",
-                "mysql cache",
-                "pdo cache",
-                "php cache",
-                "predis",
-                "redis",
-                "ssdb",
-                "wincache",
-                "xcache",
-                "zend",
-                "zend data cache",
-                "zend disk cache",
-                "zend memory cache",
-                "zend server"
-            ],
-            "time": "2017-12-15 22:11:25"
         },
         {
             "name": "phpspec/prophecy",
@@ -958,54 +864,6 @@
                 "xunit"
             ],
             "time": "2017-12-10 08:01:53"
-        },
-        {
-            "name": "psr/simple-cache",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/simple-cache.git",
-                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/753fa598e8f3b9966c886fe13f370baa45ef0e24",
-                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\SimpleCache\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interfaces for simple caching",
-            "keywords": [
-                "cache",
-                "caching",
-                "psr",
-                "psr-16",
-                "simple-cache"
-            ],
-            "time": "2017-01-02 13:31:39"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -1663,7 +1521,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.1"
+        "php": ">=5.3"
     },
     "platform-dev": []
 }

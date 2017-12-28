@@ -18,7 +18,8 @@
 
 namespace WebDeveloppement\ConstantList;
 
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
+use WebDeveloppement\ConstantList\Cache\MemCache;
 
 /**
  * Class ConstantList.
@@ -30,14 +31,9 @@ use Psr\Cache\CacheItemPoolInterface;
 class ConstantList
 {
     /**
-     * @var CacheItemPoolInterface The cache manager. Must implements PSR-6 cache interfaces.
+     * @var CacheInterface The cache manager. Must implements PSR-16 cache interfaces.
      */
     private static $cache;
-
-    /**
-     * @var array Cache used if no cache interface has been provided
-     */
-    private static $memCache = array();
 
     /**
      * @var bool Debug mode. If true, disabling the cache manager.
@@ -48,13 +44,13 @@ class ConstantList
     /**
      * Set the cache manager.
      *
-     * The given cache must implements PSR-6 CacheItemPoolInterface.
+     * The given cache must implements PSR-16 CacheInterface.
      *
-     * @see http://www.php-fig.org/psr/psr-6/
+     * @see http://www.php-fig.org/psr/psr-16/
      *
-     * @param CacheItemPoolInterface $cache
+     * @param CacheInterface $cache
      */
-    public static function setCache(CacheItemPoolInterface $cache)
+    public static function setCache(CacheInterface $cache)
     {
         self::$cache = $cache;
     }
@@ -65,11 +61,7 @@ class ConstantList
      */
     public static function clearCache()
     {
-        self::$memCache = array();
-
-        if (!empty(self::$cache)) {
-            self::getCache()->clear();
-        }
+        self::getCache()->clear();
     }
 
 
@@ -87,12 +79,16 @@ class ConstantList
     /**
      * Returns the cache manager instance.
      *
-     * If no cache has been set, use phpfastcache files cache as default. Writes files in the system temp directory.
+     * If no cache has been set, uses an in memory cache.
      *
-     * @return CacheItemPoolInterface
+     * @return CacheInterface
      */
     private static function getCache()
     {
+        if (empty(self::$cache)) {
+            self::setCache(new MemCache());
+        }
+
         return self::$cache;
     }
 
@@ -111,28 +107,15 @@ class ConstantList
             return self::parse($className);
         }
 
-        // Normalize class name to use it as cache item key
-        $normalizedClassName = mb_strtolower(preg_replace('/\\\/', '-', $className));
+        // Hash the class name to use it as cache item key
+        $key = md5($className);
 
-        // Cache provided, get item from it
-        if(!empty(self::$cache)) {
-            $cacheItem = self::getCache()->getItem($normalizedClassName);
-
-            // Cache the item if necessary
-            if (!$cacheItem->isHit()) {
-                $cacheItem->set(self::parse($className));
-                self::getCache()->save($cacheItem);
-            }
-
-            return $cacheItem->get();
+        // Cache the item if necessary
+        if (!self::getCache()->has($key)) {
+            self::getCache()->set($key, self::parse($className));
         }
 
-        // Get item from default memcache
-        if (!array_key_exists($normalizedClassName, self::$memCache)) {
-            self::$memCache[$normalizedClassName] = self::parse($className);
-        }
-
-        return self::$memCache[$normalizedClassName];
+        return self::getCache()->get($key);
     }
 
 
@@ -148,7 +131,7 @@ class ConstantList
     {
         $constants = self::get($className);
 
-        return array_key_exists($list, $constants) ? $constants[$list] : array();
+        return array_key_exists($list, $constants) ? $constants[$list] : [];
     }
 
 
@@ -204,11 +187,9 @@ class ConstantList
         $isConst = false;
 
         foreach ($tokens as $token) {
-            if (count($token) <= 1) {
-                continue;
+            if (is_array($token) && count($token) >= 2) {
+                self::parseToken($token, $constantList, $docBlock, $isConst, $reflection);
             }
-
-            self::parseToken($token, $constantList, $docBlock, $isConst, $reflection);
         }
 
         return $constantList;

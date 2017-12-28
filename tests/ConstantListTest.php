@@ -16,25 +16,19 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
-
 namespace WebDeveloppement\ConstantList\Tests;
 
-use phpFastCache\CacheManager;
 use PHPUnit\Framework\TestCase;
 use WebDeveloppement\ConstantList\ConstantList;
 use WebDeveloppement\ConstantList\ConstantListException;
 
-/**
- * @covers \WebDeveloppement\ConstantList\ConstantList
- */
 final class ConstantListTest extends TestCase
 {
     /**
      * @test
      * @testdox Retrieving all class constants
      */
-    public function get(): void
+    public function get()
     {
         $constants = ConstantList::get(ClassWithConstants::class);
 
@@ -52,7 +46,7 @@ final class ConstantListTest extends TestCase
      * @test
      * @testdox Retrieving a single constant list
      */
-    public function getList(): void
+    public function getList()
     {
         $constants = ConstantList::getList(ClassWithConstants::class, "type");
 
@@ -86,7 +80,7 @@ final class ConstantListTest extends TestCase
      * @test
      * @testdox Retrieving a constant label
      */
-    public function getLabel(): void
+    public function getLabel()
     {
         $this->assertEquals(
             'Format PDF in multi line format',
@@ -103,7 +97,7 @@ final class ConstantListTest extends TestCase
      * @test
      * @testdox Checking if a constant exists
      */
-    public function exists(): void
+    public function exists()
     {
         $this->assertTrue(
             ConstantList::exists(ClassWithConstants::class, 'format', ClassWithConstants::FORMAT_PDF)
@@ -117,48 +111,15 @@ final class ConstantListTest extends TestCase
 
     /**
      * @test
-     * @testdox Checking cache
+     * @testdox Checking others methods
      */
-    public function cache(): void
+    public function otherMethods()
     {
-        // phpfastcache is available since PHP 5.6
-        if (PHP_VERSION_ID < 50600) {
-            return;
-        }
-        
-        CacheManager::setDefaultConfig([
-            "securityKey"      => 'constant-list',
-            "path"             => sys_get_temp_dir(),
-            "itemDetailedDate" => false
-        ]);
-
-        ConstantList::setCache(CacheManager::getInstance('files'));
-
-        $defaultCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'constant-list' . DIRECTORY_SEPARATOR . "Files";
-        ConstantList::get(ClassWithConstants::class);
-
-        self::assertDirectoryExists($defaultCacheDir);
         ConstantList::clearCache();
-        self::assertDirectoryNotExists($defaultCacheDir);
-    }
-
-
-    /**
-     * @test
-     * @testdox Checking debug mode
-     */
-    public function debug(): void
-    {
-        $defaultCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'constant-list' . DIRECTORY_SEPARATOR . "Files";
-
-        ConstantList::clearCache();
-
         ConstantList::setDebug(true);
-        ConstantList::get(ClassWithConstants::class);
-        self::assertDirectoryNotExists($defaultCacheDir);
 
-        ConstantList::setDebug(false);
-        ConstantList::get(ClassWithConstants::class);
-        self::assertDirectoryExists($defaultCacheDir);
+        $this->assertTrue(
+            ConstantList::exists(ClassWithConstants::class, 'format', ClassWithConstants::FORMAT_PDF)
+        );
     }
 }
