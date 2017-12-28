@@ -176,7 +176,7 @@ class ConstantList
      *
      * @return array
      */
-    private static function parse($className): array
+    private static function parse($className)
     {
         $reflection = new \ReflectionClass($className);
         $content = file_get_contents($reflection->getFileName());
