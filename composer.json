@@ -16,7 +16,7 @@
         "psr-4": { "WebDeveloppement\\ConstantList\\Tests\\": "tests" }
     },
     "require": {
-        "php": "^7.1",
+        "php": "^5.3",
         "psr/cache": "^1.0"
     },
     "require-dev": {

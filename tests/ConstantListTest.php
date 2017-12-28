@@ -121,6 +121,11 @@ final class ConstantListTest extends TestCase
      */
     public function cache(): void
     {
+        // phpfastcache is available since PHP 5.6
+        if (PHP_VERSION_ID < 50600) {
+            return;
+        }
+        
         CacheManager::setDefaultConfig([
             "securityKey"      => 'constant-list',
             "path"             => sys_get_temp_dir(),
